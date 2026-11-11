@@ -123,6 +123,65 @@ class Payments
         }, 3);
     }
 
+    /**
+     * Estorna um pedido pago: devolve o valor pelo provedor, apaga os números e libera o estoque.
+     */
+    public function refundPaid(Order $order, PixProvider $provider, string $reason): bool
+    {
+        $payment = $order->payments()->where('status', 'pago')->latest('id')->first();
+
+        if ($order->status !== Order::PAGO || $payment === null) {
+            return false;
+        }
+
+        try {
+            if (! $provider->refund($payment)) {
+                return false;
+            }
+        } catch (Throwable $e) {
+            Log::error('Falha ao estornar pagamento', ['payment_id' => $payment->id, 'erro' => $e->getMessage()]);
+
+            return false;
+        }
+
+        DB::transaction(function () use ($order, $payment, $reason) {
+            $this->lockCampaign($order->campaign_id);
+
+            $closed = Order::whereKey($order->id)->where('status', Order::PAGO)
+                ->update(['status' => Order::ESTORNADO, 'closed_at' => now(), 'close_reason' => $reason]);
+
+            if (! $closed) {
+                return;
+            }
+
+            $tickets = DB::table('tickets')->where('order_id', $order->id)->pluck('id');
+            DB::table('instant_prizes')->whereIn('ticket_id', $tickets)->update(['ticket_id' => null, 'won_at' => null]);
+            DB::table('tickets')->where('order_id', $order->id)->delete();
+
+            Campaign::whereKey($order->campaign_id)->where('sold_count', '>=', $order->quantity)
+                ->update(['sold_count' => DB::raw('sold_count - '.(int) $order->quantity)]);
+
+            $payment->update(['status' => 'estornado', 'refunded_at' => now()]);
+        }, 3);
+
+        return true;
+    }
+
+    /**
+     * Libera todos os pedidos pendentes de uma campanha, usado ao encerrar as vendas.
+     */
+    public function releaseAll(Campaign $campaign, string $reason): int
+    {
+        $count = 0;
+
+        Order::where('campaign_id', $campaign->id)->where('status', Order::PENDENTE)->get()
+            ->each(function (Order $order) use (&$count, $reason) {
+                $count += (int) $this->release($order, Order::CANCELADO, $reason);
+            });
+
+        return $count;
+    }
+
     public function expireDue(): int
     {
         $limit = now()->subSeconds((int) config('pix.grace_seconds'));

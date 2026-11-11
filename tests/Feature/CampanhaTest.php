@@ -67,10 +67,10 @@ class CampanhaTest extends TestCase
 
         $faltando = $campanha->legalMissing();
 
-        $this->assertNotContains('Razão social do responsável', $faltando);
+        $this->assertNotContains('razão social do responsável', $faltando);
         $this->assertContains('CNPJ do responsável', $faltando);
-        $this->assertContains('Sociedade de capitalização', $faltando);
-        $this->assertContains('Entidade beneficiada', $faltando);
+        $this->assertContains('sociedade de capitalização', $faltando);
+        $this->assertContains('entidade beneficiada', $faltando);
     }
 
     public function test_numero_e_formatado_com_os_digitos_da_campanha(): void

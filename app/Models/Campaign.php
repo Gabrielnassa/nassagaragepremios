@@ -135,20 +135,20 @@ class Campaign extends Model
     public function legalMissing(): array
     {
         $required = [
-            'legal_company' => 'Razão social do responsável',
+            'legal_company' => 'razão social do responsável',
             'legal_cnpj' => 'CNPJ do responsável',
-            'legal_modality' => 'Modalidade',
-            'legal_process' => 'Número do processo ou certificado',
-            'legal_regulation_path' => 'Regulamento em PDF',
-            'draw_criterion' => 'Critério de apuração',
-            'delivery_deadline' => 'Prazo de entrega do prêmio',
+            'legal_modality' => 'modalidade',
+            'legal_process' => 'número do processo ou certificado',
+            'legal_regulation_path' => 'regulamento em PDF',
+            'draw_criterion' => 'critério de apuração',
+            'delivery_deadline' => 'prazo de entrega do prêmio',
         ];
 
         if ($this->legal_modality === 'capitalizacao') {
-            $required['legal_capitalization_company'] = 'Sociedade de capitalização';
+            $required['legal_capitalization_company'] = 'sociedade de capitalização';
         }
         if (in_array($this->legal_modality, ['capitalizacao', 'sorteio_filantropico'], true)) {
-            $required['legal_beneficiary'] = 'Entidade beneficiada';
+            $required['legal_beneficiary'] = 'entidade beneficiada';
         }
 
         return array_values(array_filter($required, fn ($label, $field) => blank($this->{$field}), ARRAY_FILTER_USE_BOTH));

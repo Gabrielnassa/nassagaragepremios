@@ -10,6 +10,15 @@ class AdminUser extends Authenticatable
 
     protected $hidden = ['password', 'remember_token', 'totp_secret'];
 
+    public const PAPEIS = ['leitura' => 'Leitura', 'operador' => 'Operador', 'dono' => 'Dono'];
+
+    private const NIVEIS = ['leitura' => 1, 'operador' => 2, 'dono' => 3];
+
+    public function pode(string $papel): bool
+    {
+        return (self::NIVEIS[$this->role] ?? 0) >= self::NIVEIS[$papel];
+    }
+
     protected function casts(): array
     {
         return [

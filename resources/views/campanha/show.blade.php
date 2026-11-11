@@ -258,7 +258,7 @@
                         <p>Fora do ambiente de demonstração, a campanha só pode ser ativada com estes campos preenchidos no painel:</p>
                         <ul>
                             @foreach ($faltando as $campo)
-                                <li>{{ $campo }}</li>
+                                <li>{{ Str::ucfirst($campo) }}</li>
                             @endforeach
                         </ul>
                     </div>

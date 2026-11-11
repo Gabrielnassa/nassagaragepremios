@@ -38,3 +38,5 @@ Route::post('/webhooks/pix', PixWebhookController::class)
     ->withoutMiddleware(ValidateCsrfToken::class)
     ->middleware('throttle:webhook')
     ->name('webhook.pix');
+
+require __DIR__.'/painel.php';

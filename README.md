@@ -27,6 +27,16 @@ php artisan demo:limpar
 
 O primeiro comando cria campanhas, clientes e pedidos fictícios e se recusa a rodar em produção. O segundo remove tudo o que foi criado.
 
+## Painel
+
+O painel fica em `/painel`. O primeiro usuário é criado pela linha de comando; o segundo fator (aplicativo autenticador) é configurado no primeiro acesso.
+
+```bash
+php artisan painel:usuario voce@exemplo.com --nome="Seu nome" --papel=dono
+```
+
+Perfis: `dono` (tudo), `operador` (campanhas e pedidos, sem mudar status, apurar, estornar ou configurar) e `leitura`. Para refazer o segundo fator de alguém, rode o mesmo comando com `--zerar-2fa`.
+
 ## Pagamento por Pix
 
 O provedor fica atrás da interface `App\Pix\PixProvider` e é escolhido por `PIX_PROVIDER` no `.env`.
