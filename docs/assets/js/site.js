@@ -249,36 +249,123 @@
             }).observe(cta);
         }
 
-        /* Checkout, passo do telefone */
+        /* Checkout em passos */
 
         var formulario = checkout.querySelector('[data-checkout]');
         var telefone = formulario.querySelector('#telefone');
-        var ajuda = formulario.querySelector('[data-telefone-ajuda]');
-        var textoAjuda = ajuda.textContent;
-        var aviso = formulario.querySelector('[data-checkout-aviso]');
+        var token = document.querySelector('meta[name="csrf-token"]');
+        var passo = 'telefone';
+        var enviando = false;
+
+        var opcoes = function (dados) {
+            return {};
+        };
+
+        var limparErros = function () {
+            todos('[data-erro-de]', formulario).forEach(function (el) {
+                if (el.dataset.padrao) {
+                    el.textContent = el.dataset.padrao;
+                    el.classList.remove('dica--erro');
+                } else {
+                    el.textContent = '';
+                    el.hidden = true;
+                }
+            });
+            todos('[aria-invalid]', formulario).forEach(function (el) { el.removeAttribute('aria-invalid'); });
+        };
+
+        var mostrarErro = function (campo, mensagem) {
+            var etapa = formulario.querySelector('[data-passo="' + passo + '"]');
+            var alvo = etapa.querySelector('[data-erro-de="' + campo + '"]') || formulario.querySelector('[data-erro-de="geral"]');
+            var entrada = etapa.querySelector('[name="' + campo + '"]');
+
+            alvo.textContent = mensagem;
+            alvo.hidden = false;
+            if (alvo.classList.contains('dica')) {
+                alvo.classList.add('dica--erro');
+            }
+            if (entrada) {
+                entrada.setAttribute('aria-invalid', 'true');
+                entrada.focus();
+            }
+        };
+
+        var mostrarPasso = function (nome) {
+            passo = nome;
+            limparErros();
+            todos('[data-passo]', formulario).forEach(function (el) { el.hidden = el.dataset.passo !== nome; });
+            var foco = formulario.querySelector('[data-passo="' + nome + '"] input, [data-passo="' + nome + '"] button');
+            if (foco) {
+                foco.focus();
+            }
+        };
+
+        var ocupado = function (sim) {
+            enviando = sim;
+            formulario.setAttribute('aria-busy', String(sim));
+            todos('button[type="submit"]', formulario).forEach(function (b) { b.disabled = sim; });
+        };
 
         telefone.addEventListener('input', function () {
             telefone.value = mascaras.telefone(telefone.value.replace(/\D/g, ''));
-            telefone.removeAttribute('aria-invalid');
-            ajuda.textContent = textoAjuda;
-            ajuda.classList.remove('dica--erro');
-            aviso.hidden = true;
+            limparErros();
+        });
+
+        todos('[data-voltar]', formulario).forEach(function (botao) {
+            botao.addEventListener('click', function () { mostrarPasso('telefone'); });
         });
 
         formulario.addEventListener('submit', function (evento) {
             evento.preventDefault();
-            var d = telefone.value.replace(/\D/g, '');
-            var valido = (d.length === 10 || d.length === 11) && Number(d.slice(0, 2)) >= 11;
+            if (enviando) {
+                return;
+            }
+            limparErros();
 
-            if (!valido) {
-                telefone.setAttribute('aria-invalid', 'true');
-                ajuda.textContent = 'Digite o DDD e o número, por exemplo (11) 90000-0000.';
-                ajuda.classList.add('dica--erro');
-                telefone.focus();
+            var digitos = telefone.value.replace(/\D/g, '');
+            if (!((digitos.length === 10 || digitos.length === 11) && Number(digitos.slice(0, 2)) >= 11)) {
+                mostrarPasso('telefone');
+                mostrarErro('telefone', 'Digite o DDD e o número, por exemplo (11) 90000-0000.');
                 return;
             }
 
-            aviso.hidden = false;
+            var dados = { telefone: digitos, quantidade: quantidade };
+            if (passo === 'novo') {
+                dados.nome = formulario.querySelector('#nome').value;
+                dados.cpf = formulario.querySelector('#cpf-compra').value;
+                dados.nascimento = formulario.querySelector('#nascimento-compra').value;
+                dados.email = formulario.querySelector('#email').value;
+                dados.aceite = formulario.querySelector('#aceite').checked;
+            }
+
+            ocupado(true);
+            fetch(passo === 'telefone' ? formulario.dataset.identificar : formulario.dataset.criar, opcoes(dados))
+                .then(function (resposta) {
+                    return resposta.json().catch(function () { return {}; }).then(function (corpo) {
+                        return { ok: resposta.ok, status: resposta.status, corpo: corpo };
+                    });
+                })
+                .then(function (r) {
+                    if (r.ok && r.corpo.url) {
+                        window.location.href = r.corpo.url;
+                        return;
+                    }
+                    ocupado(false);
+                    if (r.ok && passo === 'telefone') {
+                        formulario.querySelector('[data-nome]').textContent = r.corpo.nome || '';
+                        mostrarPasso(r.corpo.conhecido ? 'conhecido' : 'novo');
+                    } else if (r.status === 429) {
+                        mostrarErro('geral', 'Muitas tentativas seguidas. Espere um minuto e tente de novo.');
+                    } else if (r.status === 419) {
+                        mostrarErro('geral', 'A página ficou aberta por muito tempo. Recarregue e tente de novo.');
+                    } else {
+                        mostrarErro(r.corpo.campo || 'geral', r.corpo.mensagem || 'Não foi possível continuar. Tente de novo em instantes.');
+                    }
+                })
+                .catch(function () {
+                    ocupado(false);
+                    mostrarErro('geral', 'Sem resposta do servidor. Confira sua internet e tente de novo.');
+                });
         });
 
         definir(quantidade);

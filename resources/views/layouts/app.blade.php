@@ -16,6 +16,7 @@
     <title>@hasSection('titulo')@yield('titulo') · {{ $marca }}@else{{ $marca }}@endif</title>
     <meta name="description" content="@yield('descricao', 'Campanhas da Nassa Garage: escolha a quantidade, pague por Pix e acompanhe a apuração.')">
     <meta name="theme-color" content="#050607">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta property="og:site_name" content="{{ $marca }}">
     <meta property="og:title" content="@yield('titulo', $marca)">
     <meta property="og:type" content="website">

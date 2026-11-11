@@ -295,14 +295,62 @@
             <div><p class="rotulo">Campanha</p><p>{{ $campaign->title }}</p></div>
             <div class="checkout__valor"><p class="rotulo" data-resumo-qtd></p><p class="num" data-total></p></div>
         </div>
-        <form class="checkout__passo" data-checkout novalidate>
-            <div class="campo">
-                <label for="telefone">Seu telefone com DDD</label>
-                <input id="telefone" name="telefone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(11) 90000-0000" aria-describedby="telefone-ajuda" required>
-                <p class="dica" id="telefone-ajuda" data-telefone-ajuda>Usamos o telefone para localizar seu cadastro e avisar sobre o pedido.</p>
+        <form class="checkout__passo" data-checkout novalidate
+            data-identificar="{{ route('checkout.identificar') }}"
+            data-criar="{{ route('checkout.criar', $campaign) }}">
+            <div class="checkout__etapa" data-passo="telefone">
+                <div class="campo">
+                    <label for="telefone">Seu telefone com DDD</label>
+                    <input id="telefone" name="telefone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(11) 90000-0000" aria-describedby="erro-telefone" required>
+                    <p class="dica" id="erro-telefone" data-erro-de="telefone" data-padrao="Usamos o telefone para localizar seu cadastro e avisar sobre o pedido.">Usamos o telefone para localizar seu cadastro e avisar sobre o pedido.</p>
+                </div>
+                <button class="cta cta--simples" type="submit">Continuar @include('partials.icon', ['name' => 'arrow', 'size' => 20])</button>
             </div>
-            <button class="cta cta--simples" type="submit">Continuar @include('partials.icon', ['name' => 'arrow', 'size' => 20])</button>
-            <p class="checkout__aviso" data-checkout-aviso role="status" hidden>O pagamento ainda não está ligado nesta versão de demonstração. Esta etapa entra na próxima entrega.</p>
+
+            <div class="checkout__etapa" data-passo="conhecido" hidden>
+                <div class="checkout__cadastro">
+                    <p class="rotulo">Cadastro encontrado</p>
+                    <p class="checkout__nome" data-nome></p>
+                    <p class="dica">O pedido sai neste nome. Se não for você, use outro telefone.</p>
+                </div>
+                <button class="cta cta--simples" type="submit">Gerar Pix @include('partials.icon', ['name' => 'arrow', 'size' => 20])</button>
+                <button class="botao-linha" type="button" data-voltar>Usar outro telefone</button>
+            </div>
+
+            <div class="checkout__etapa" data-passo="novo" hidden>
+                <p class="dica">Primeira compra com este telefone. Os dados identificam você se for contemplado.</p>
+                <div class="campo">
+                    <label for="nome">Nome completo</label>
+                    <input id="nome" name="nome" type="text" autocomplete="name" aria-describedby="erro-nome" required>
+                    <p class="dica dica--erro" id="erro-nome" data-erro-de="nome" hidden></p>
+                </div>
+                <div class="checkout__dupla">
+                    <div class="campo">
+                        <label for="cpf-compra">CPF</label>
+                        <input id="cpf-compra" name="cpf" type="text" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" data-mascara="cpf" aria-describedby="erro-cpf-compra" required>
+                        <p class="dica dica--erro" id="erro-cpf-compra" data-erro-de="cpf" hidden></p>
+                    </div>
+                    <div class="campo">
+                        <label for="nascimento-compra">Nascimento</label>
+                        <input id="nascimento-compra" name="nascimento" type="text" inputmode="numeric" autocomplete="bday" placeholder="dd/mm/aaaa" data-mascara="data" aria-describedby="erro-nascimento-compra" required>
+                        <p class="dica dica--erro" id="erro-nascimento-compra" data-erro-de="nascimento" hidden></p>
+                    </div>
+                </div>
+                <div class="campo">
+                    <label for="email">E-mail <span class="opcional">opcional</span></label>
+                    <input id="email" name="email" type="email" autocomplete="email" aria-describedby="erro-email">
+                    <p class="dica dica--erro" id="erro-email" data-erro-de="email" hidden></p>
+                </div>
+                <label class="aceite" for="aceite">
+                    <input id="aceite" name="aceite" type="checkbox" value="1" aria-describedby="erro-aceite">
+                    <span>Tenho 18 anos ou mais e concordo com o regulamento desta campanha e com o uso dos meus dados para esta compra.</span>
+                </label>
+                <p class="dica dica--erro" id="erro-aceite" data-erro-de="aceite" hidden></p>
+                <button class="cta cta--simples" type="submit">Gerar Pix @include('partials.icon', ['name' => 'arrow', 'size' => 20])</button>
+                <button class="botao-linha" type="button" data-voltar>Usar outro telefone</button>
+            </div>
+
+            <p class="checkout__aviso" data-erro-de="geral" role="alert" hidden></p>
         </form>
         <p class="confianca">@include('partials.icon', ['name' => 'lock', 'size' => 14]) Você paga por Pix e recebe os {{ termo('plural') }} na confirmação.</p>
     </dialog>

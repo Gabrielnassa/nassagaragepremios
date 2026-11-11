@@ -67,6 +67,17 @@ class ConsultaTest extends TestCase
         $this->assertSame(session('errors')->first('cpf'), $errado->getSession()->get('errors')->first('cpf'));
     }
 
+    public function test_limites_sao_contados_por_rota(): void
+    {
+        $this->compra();
+
+        for ($i = 0; $i < 20; $i++) {
+            $this->get('/pedido/ABCDEFGHIJ/status')->assertOk();
+        }
+
+        $this->post('/meus-numeros', ['cpf' => self::CPF, 'nascimento' => '05/03/1990'])->assertOk();
+    }
+
     public function test_consulta_tem_limite_de_tentativas(): void
     {
         for ($i = 0; $i < 8; $i++) {
