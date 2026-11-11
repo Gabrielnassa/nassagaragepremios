@@ -8,6 +8,7 @@
     $instantaneos = $campaign->instantPrizes;
     $sairam = $instantaneos->whereNotNull('ticket_id');
     $faltando = $campaign->legalMissing();
+    $resto = $promo ? max(0, $promo->ends_at->getTimestamp() - time()) : 0;
 @endphp
 
 @section('titulo', $campaign->title)
@@ -135,7 +136,7 @@
                 <div class="promo__topo">
                     <p class="rotulo rotulo--alerta">Promoção com prazo</p>
                     <p class="promo__relogio">@include('partials.icon', ['name' => 'clock', 'size' => 16]) Encerra em
-                        <time class="num" data-contador="{{ $promo->ends_at->toIso8601String() }}">{{ gmdate('H:i:s', max(0, $promo->ends_at->getTimestamp() - time())) }}</time>
+                        <time class="num" data-contador="{{ $promo->ends_at->toIso8601String() }}">{{ $resto >= 86400 ? intdiv($resto, 86400).'d ' : '' }}{{ gmdate('H:i:s', $resto % 86400) }}</time>
                     </p>
                 </div>
                 <h2 id="titulo-promo">{{ $promo->title }} <span>{{ $promo->prize }}</span></h2>

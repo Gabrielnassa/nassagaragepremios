@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+<defs><pattern id="h" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)"><rect width="28" height="28" fill="#14161A"/><rect width="1" height="28" fill="#1F232A"/></pattern></defs>
+<rect width="1200" height="800" fill="url(#h)"/>
+<rect x="64" y="64" width="1072" height="672" fill="none" stroke="#2B2F37" stroke-width="2"/>
+<text x="104" y="640" font-family="Arial Narrow, Arial, sans-serif" font-size="150" font-weight="700" fill="#2B2F37">03</text>
+<text x="104" y="692" font-family="Arial, sans-serif" font-size="30" fill="#9299A5">Foto do prêmio: Interior</text>
+</svg>

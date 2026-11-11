@@ -95,7 +95,8 @@
 
         function tique() {
             var resto = Math.max(0, Math.floor((fim - Date.now()) / 1000));
-            relogio.textContent = doisDigitos(Math.floor(resto / 3600)) + ':' + doisDigitos(Math.floor(resto % 3600 / 60)) + ':' + doisDigitos(resto % 60);
+            var dias = Math.floor(resto / 86400);
+            relogio.textContent = (dias ? dias + 'd ' : '') + doisDigitos(Math.floor(resto % 86400 / 3600)) + ':' + doisDigitos(Math.floor(resto % 3600 / 60)) + ':' + doisDigitos(resto % 60);
             if (resto === 0) {
                 window.clearInterval(timer);
             }
