@@ -5,11 +5,11 @@
             @include('partials.estado', ['state' => $c->publicState()])
             <strong>{{ $c->title }}</strong>
             @if ($c->status === \App\Models\Campaign::EM_BREVE && $c->starts_at)
-                <span>Abre em {{ hora_local($c->starts_at, 'd/m \à\s H\hi') }}</span>
+                <span class="linha__info">Abre em {{ hora_local($c->starts_at, 'd/m \à\s H\hi') }}</span>
             @elseif ($c->mainWinner)
-                <span>{{ termo('contemplado') }} <b class="num">{{ $c->formatNumber($c->mainWinner->number) }}</b> · {{ $c->mainWinner->display_name }}</span>
+                <span class="linha__info">{{ termo('contemplado') }} @include('partials.placa', ['numero' => $c->formatNumber($c->mainWinner->number), 'tipo' => 'ouro'])</span>
             @elseif ($c->draw_at)
-                <span>Apuração em {{ hora_local($c->draw_at) }}</span>
+                <span class="linha__info">Apuração em {{ hora_local($c->draw_at) }}</span>
             @endif
         </span>
         @include('partials.icon', ['name' => 'right', 'size' => 18])

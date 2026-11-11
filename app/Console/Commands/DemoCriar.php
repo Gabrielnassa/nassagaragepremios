@@ -46,6 +46,7 @@ class DemoCriar extends Command
         });
 
         $this->info('Dados de demonstração criados.');
+        $this->line('Consulta de teste: CPF '.$this->cpf(1).', nascimento 01/01/1990.');
 
         return self::SUCCESS;
     }
@@ -125,11 +126,11 @@ class DemoCriar extends Command
 
         $campaign->timedPromos()->create([
             'type' => 'maior_numero',
-            'title' => 'Maior número do dia',
-            'rules' => 'Exemplo de regra: quem tiver o maior número entre as compras pagas hoje, até 23h59, leva o prêmio.',
+            'title' => 'Maior número da semana',
+            'rules' => 'Exemplo de regra: quem tiver o maior número entre as compras pagas até o fim do contador leva o prêmio.',
             'prize' => 'R$ 1.000 no Pix',
-            'starts_at' => $today->startOfDay()->utc(),
-            'ends_at' => $today->endOfDay()->utc(),
+            'starts_at' => $start->utc(),
+            'ends_at' => $today->addDays(6)->endOfDay()->utc(),
         ]);
 
         $instant = array_merge(array_slice($sold, 0, 4), array_slice($free, 0, 6));
@@ -175,6 +176,7 @@ class DemoCriar extends Command
         ]);
 
         $campaign->prizes()->create(['position' => 1, 'title' => 'R$ 10.000 no Pix']);
+        $campaign->images()->create(['path' => 'demo/foto-4.svg', 'alt' => 'Foto de exemplo', 'width' => 1200, 'height' => 800]);
 
         $numbers = range(0, 999);
         shuffle($numbers);
@@ -202,7 +204,7 @@ class DemoCriar extends Command
 
     private function upcomingCampaign(): void
     {
-        Campaign::create([
+        $campaign = Campaign::create([
             'slug' => 'proxima-campanha-exemplo',
             'title' => 'Próxima campanha',
             'subtitle' => 'Exemplo de campanha anunciada antes da abertura das vendas.',
@@ -213,6 +215,8 @@ class DemoCriar extends Command
             'starts_at' => CarbonImmutable::now('America/Sao_Paulo')->addDays(9)->setTime(12, 0)->utc(),
             'is_demo' => true,
         ]);
+
+        $campaign->images()->create(['path' => 'demo/foto-2.svg', 'alt' => 'Foto de exemplo', 'width' => 1200, 'height' => 800]);
     }
 
     private function orders(Campaign $campaign, array $customers, array $numbers, callable $paidAt): void
@@ -269,14 +273,28 @@ class DemoCriar extends Command
     private function placeholder(int $index, string $label): string
     {
         $n = str_pad((string) $index, 2, '0', STR_PAD_LEFT);
+        [$zoom, $dx, $dy, $luz] = [[1, 0, 0, 600], [1.55, -40, -330, 380], [1.55, -640, -330, 860], [1.2, -120, -150, 600]][$index - 1];
 
         return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
-<defs><pattern id="h" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)"><rect width="28" height="28" fill="#14161A"/><rect width="1" height="28" fill="#1F232A"/></pattern></defs>
-<rect width="1200" height="800" fill="url(#h)"/>
-<rect x="64" y="64" width="1072" height="672" fill="none" stroke="#2B2F37" stroke-width="2"/>
-<text x="104" y="640" font-family="Arial Narrow, Arial, sans-serif" font-size="150" font-weight="700" fill="#2B2F37">$n</text>
-<text x="104" y="692" font-family="Arial, sans-serif" font-size="30" fill="#9299A5">Foto do prêmio: $label</text>
+<defs>
+<radialGradient id="luz" cx="$luz" cy="120" r="760" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3A4352"/><stop offset=".55" stop-color="#171B22"/><stop offset="1" stop-color="#08090B"/></radialGradient>
+<linearGradient id="piso" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A1E25"/><stop offset="1" stop-color="#08090B"/></linearGradient>
+<linearGradient id="capa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5C97E8"/><stop offset=".4" stop-color="#2A61AD"/><stop offset="1" stop-color="#132D52"/></linearGradient>
+<radialGradient id="sombra" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".75"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1200" height="800" fill="url(#luz)"/>
+<g transform="translate($dx $dy) scale($zoom)">
+<g stroke="#FFFFFF" stroke-opacity=".035" stroke-width="2"><path d="M-400 120H1600M-400 190H1600M-400 260H1600M-400 330H1600M-400 400H1600M-400 470H1600M-400 540H1600"/></g>
+<rect x="-400" y="610" width="2000" height="400" fill="url(#piso)"/>
+<path d="M-400 610H1600" stroke="#2B303A" stroke-width="2"/>
+<ellipse cx="620" cy="626" rx="560" ry="34" fill="url(#sombra)"/>
+<path d="M150 612C150 560 176 520 232 500C300 478 380 470 440 456C500 402 560 354 660 346C760 340 832 354 890 400C932 430 990 440 1040 462C1076 480 1086 540 1086 612Q1000 624 900 613T700 615T500 612T300 616T150 612Z" fill="url(#capa)"/>
+<g fill="none" stroke="#0C1F3B" stroke-opacity=".5" stroke-width="5" stroke-linecap="round"><path d="M660 350C648 430 640 520 656 610"/><path d="M440 460C428 520 446 570 438 610"/><path d="M890 404C908 480 894 560 912 610"/><path d="M300 484C286 530 300 580 290 612"/><path d="M1000 446C1012 500 998 566 1010 610"/><path d="M560 380C548 450 566 540 552 610"/><path d="M780 348C790 430 772 530 786 612"/></g>
+<path d="M232 500C300 478 380 470 440 456C500 402 560 354 660 346C760 340 832 354 890 400C932 430 990 440 1040 462" fill="none" stroke="#B9D4FA" stroke-opacity=".7" stroke-width="4" stroke-linecap="round"/>
+</g>
+<text x="44" y="70" font-family="Arial Narrow, Arial, sans-serif" font-size="30" font-weight="700" fill="#F1F3F6" fill-opacity=".85" letter-spacing="3">FOTO DE EXEMPLO $n</text>
+<text x="44" y="104" font-family="Arial, sans-serif" font-size="22" fill="#9BA3B0">$label · a foto real do prêmio entra aqui</text>
 </svg>
 SVG;
     }

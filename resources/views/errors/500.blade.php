@@ -11,7 +11,7 @@
         <p class="erro__codigo num">500</p>
         <h1>Algo deu errado do nosso lado</h1>
         <p>Tente de novo em alguns minutos. Se você estava pagando um pedido, ele continua registrado.</p>
-        <a class="cta cta--curto" href="/">Voltar ao início</a>
+        <a class="cta cta--simples" href="/">Voltar ao início</a>
     </main>
 </body>
 </html>

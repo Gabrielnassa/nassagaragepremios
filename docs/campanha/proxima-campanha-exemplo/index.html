@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Próxima campanha · Nassa Garage</title>
     <meta name="description" content="Exemplo de campanha anunciada antes da abertura das vendas.">
-    <meta name="theme-color" content="#0B0C0E">
+    <meta name="theme-color" content="#050607">
     <meta property="og:site_name" content="Nassa Garage">
     <meta property="og:title" content="Próxima campanha">
     <meta property="og:type" content="website">
-                    <meta name="robots" content="noindex, nofollow">
+                <meta property="og:image" content="../../storage/demo/foto-2.svg">
+                <meta name="robots" content="noindex, nofollow">
         <link rel="icon" href="../../assets/img/favicon.svg?v=fe97ec46" type="image/svg+xml">
-    <link rel="preload" href="../../assets/fonts/saira-condensed-600.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="../../assets/fonts/saira-condensed-800.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="../../assets/fonts/saira-400.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../../assets/css/site.css?v=083ea0d7">
-    <script src="../../assets/js/site.js?v=7abd3767" defer></script>
+    <link rel="stylesheet" href="../../assets/css/site.css?v=339ab402">
+    <script src="../../assets/js/site.js?v=341d36da" defer></script>
 </head>
 <body>
     <a class="pular" href="#conteudo">Pular para o conteúdo</a>
@@ -24,40 +25,49 @@
     <header class="topo">
         <div class="topo__dentro">
             <button class="topo__menu" type="button" data-abre="menu" aria-haspopup="dialog" aria-label="Abrir menu">
-                <svg class="icone" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" aria-hidden="true"><path d="M3 6h18M3 12h12M3 18h18"/></svg>
+                <svg class="icone" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 12h12M3 18h18"/></svg>
             </button>
-            <a class="marca" href="../../" aria-label="Nassa Garage, página inicial">
-                <span class="marca__a">Nassa</span><span class="marca__corte" aria-hidden="true"></span><span class="marca__b">Garage</span>
-            </a>
+            <a class="marca" href="../../" aria-label="Nassa Garage, página inicial"><span class="marca__faixas" aria-hidden="true"><i></i><i></i></span>
+<span class="marca__texto"><span class="marca__a">Nassa</span><span class="marca__b">Garage</span></span>
+</a>
             <nav class="topo__nav" aria-label="Principal">
-                <a href="../../" >Campanhas</a>
+                <a href="../../"  aria-current="page" >Campanhas</a>
+                <a href="../../meus-numeros/" >Meus números</a>
+                <a href="../../#como-funciona">Como funciona</a>
             </nav>
-                            <span class="topo__vazio" aria-hidden="true"></span>
+                            <a class="topo__suporte" href="../../meus-numeros/">
+                    <svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V6h18v2a2.5 2.5 0 000 5v2a2.5 2.5 0 000 0v3H3v-3a2.5 2.5 0 000-5z" transform="translate(0 -.5)"/><path d="M14 6v2M14 11v2M14 16v2"/></svg>
+                    <span>Consultar</span>
+                </a>
                     </div>
-    </header>
+                    </header>
 
     <dialog class="menu" id="menu" aria-label="Menu">
         <div class="menu__topo">
-            <span class="marca">
-                <span class="marca__a">Nassa</span><span class="marca__corte" aria-hidden="true"></span><span class="marca__b">Garage</span>
-            </span>
+            <span class="marca"><span class="marca__faixas" aria-hidden="true"><i></i><i></i></span>
+<span class="marca__texto"><span class="marca__a">Nassa</span><span class="marca__b">Garage</span></span>
+</span>
             <button class="botao-icone" type="button" data-fecha aria-label="Fechar menu">
-                <svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                <svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
             </button>
         </div>
         <nav class="menu__lista" aria-label="Menu">
             <p class="rotulo">Principal</p>
-            <a href="../../">Início <svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-</a>
-            <a href="../../#campanhas">Campanhas <svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-</a>
+            <a href="../../"><svg class="icone" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg>
+ Início</a>
+            <a href="../../#campanhas"><svg class="icone" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h14l-3 5 3 5H5"/></svg>
+ Campanhas</a>
+            <a href="../../meus-numeros/"><svg class="icone" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V6h18v2a2.5 2.5 0 000 5v2a2.5 2.5 0 000 0v3H3v-3a2.5 2.5 0 000-5z" transform="translate(0 -.5)"/><path d="M14 6v2M14 11v2M14 16v2"/></svg>
+ Meus números</a>
+            <a href="../../#como-funciona"><svg class="icone" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>
+ Como funciona</a>
                             <p class="rotulo">Canais oficiais</p>
-                                                    <a href="https://instagram.com/nssgrg" rel="noopener">Instagram &#64;nssgrg <svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-</a>
+                                                    <a href="https://instagram.com/nssgrg" rel="noopener"><svg class="icone" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M13 5l7 7-7 7"/></svg>
+ Instagram &#64;nssgrg</a>
                                     </nav>
     </dialog>
 
-    <main id="conteudo">
+    <main id="conteudo" class="painel">
         <article class="campanha" data-campanha
     data-preco="2990"
     data-min="1"
@@ -65,21 +75,34 @@
     data-ao-vivo="../../campanha/proxima-campanha-exemplo/ao-vivo">
 
     <section class="galeria" aria-label="Fotos do prêmio" data-galeria>
-        <div class="galeria__trilho" data-trilho tabindex="0">
-                            <figure class="galeria__slide"><span class="sem-foto">Foto em breve</span></figure>
+        <div class="galeria__palco">
+            <div class="galeria__trilho" data-trilho tabindex="0">
+                                    <figure class="galeria__slide"><img src="../../storage/demo/foto-2.svg" alt="Foto de exemplo" width="1200" height="800"
+         fetchpriority="high" >
+</figure>
+                            </div>
                     </div>
             </section>
 
     <section class="compra" aria-labelledby="titulo-campanha">
-        <span class="estado estado--em_breve">Em breve</span>
-        <h1 id="titulo-campanha">Próxima campanha</h1>
-        <p class="compra__sub">Exemplo de campanha anunciada antes da abertura das vendas.</p>
-        
-                    <div class="situacao">
-                <p class="preco"><strong class="num">R$ 29,90</strong> por número</p>
-                                    <p>As vendas abrem em <strong>19/11/2026 às 12h00</strong>.</p>
-                            </div>
-            </section>
+        <header class="compra__cabeca">
+            <span class="estado estado--em_breve"><span>Em breve</span></span>
+            <h1 id="titulo-campanha">Próxima campanha</h1>
+            <p>Exemplo de campanha anunciada antes da abertura das vendas.</p>        </header>
+
+        <div class="compra__cartao">
+            
+                            <p class="preco"><small>Por apenas</small><strong class="num">R$ 29,90</strong><small>por número</small></p>
+                <div class="situacao">
+                                            <p><strong>As vendas abrem em 19/11/2026 às 12h00.</strong></p>
+                        <p>Volte nesse horário para garantir os seus.</p>
+                                    </div>
+            
+            <a class="compra__consulta" href="../../meus-numeros/"><svg class="icone" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V6h18v2a2.5 2.5 0 000 5v2a2.5 2.5 0 000 0v3H3v-3a2.5 2.5 0 000-5z" transform="translate(0 -.5)"/><path d="M14 6v2M14 11v2M14 16v2"/></svg>
+ Meus números <svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+</a>
+        </div>
+    </section>
 
     <div class="detalhes">
         
@@ -90,7 +113,7 @@
         <section class="secao" aria-labelledby="titulo-legal">
             <h2 id="titulo-legal">Responsável e regulamento</h2>
                             <div class="alerta">
-                    <svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>
+                    <svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>
                     <div>
                         <strong>Dados legais ainda não preenchidos.</strong>
                         <p>Fora do ambiente de demonstração, a campanha só pode ser ativada com estes campos preenchidos no painel:</p>
@@ -113,13 +136,21 @@
 
     <footer class="rodape">
         <div class="rodape__dentro">
-            <div>
-                <span class="marca marca--pequena">
-                    <span class="marca__a">Nassa</span><span class="marca__corte" aria-hidden="true"></span><span class="marca__b">Garage</span>
-                </span>
+            <div class="rodape__marca">
+                <span class="marca"><span class="marca__faixas" aria-hidden="true"><i></i><i></i></span>
+<span class="marca__texto"><span class="marca__a">Nassa</span><span class="marca__b">Garage</span></span>
+</span>
                             </div>
+            <nav class="rodape__links" aria-label="Rodapé">
+                <a href="../../#campanhas">Campanhas</a>
+                <a href="../../meus-numeros/">Meus números</a>
+                <a href="../../#como-funciona">Como funciona</a>
+                <a href="https://instagram.com/nssgrg" rel="noopener">Instagram</a>            </nav>
             <p class="rodape__idade"><span class="selo-idade">18+</span> Participação permitida apenas para maiores de 18 anos.</p>
-            <p class="rodape__fim">© 2026 Nassa Garage</p>
+            <div class="rodape__fim">
+                <p>© 2026 Nassa Garage</p>
+                <p>Desenvolvido por <strong>NassaTech</strong></p>
+            </div>
         </div>
     </footer>
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
+use App\Models\Winner;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -23,6 +24,7 @@ class HomeController extends Controller
             'ativas' => $campaigns->get('ativas', collect()),
             'emBreve' => $campaigns->get('em_breve', collect()),
             'encerradas' => $campaigns->get('encerradas', collect()),
+            'ganhadores' => Winner::with('campaign')->whereNotNull('published_at')->latest('awarded_on')->limit(8)->get(),
             'demo' => $campaigns->flatten()->contains('is_demo', true),
         ]);
     }

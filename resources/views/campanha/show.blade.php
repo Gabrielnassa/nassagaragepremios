@@ -9,14 +9,16 @@
     $sairam = $instantaneos->whereNotNull('ticket_id');
     $faltando = $campaign->legalMissing();
     $resto = $promo ? max(0, $promo->ends_at->getTimestamp() - time()) : 0;
+    $fotos = $campaign->images;
 @endphp
 
 @section('titulo', $campaign->title)
 @section('descricao', $campaign->subtitle ?? $campaign->title)
+@section('sem_abas', '1')
 
 @push('meta')
-    @if ($campaign->images->first())
-        <meta property="og:image" content="{{ $campaign->images->first()->url() }}">
+    @if ($fotos->first())
+        <meta property="og:image" content="{{ $fotos->first()->url() }}">
     @endif
 @endpush
 
@@ -28,128 +30,151 @@
     data-ao-vivo="{{ route('campanha.ao-vivo', $campaign) }}">
 
     <section class="galeria" aria-label="Fotos do prêmio" data-galeria>
-        <div class="galeria__trilho" data-trilho tabindex="0">
-            @forelse ($campaign->images as $image)
-                <figure class="galeria__slide">@include('partials.foto', ['image' => $image, 'eager' => $loop->first])</figure>
-            @empty
-                <figure class="galeria__slide"><span class="sem-foto">Foto em breve</span></figure>
-            @endforelse
+        <div class="galeria__palco">
+            <div class="galeria__trilho" data-trilho tabindex="0">
+                @forelse ($fotos as $image)
+                    <figure class="galeria__slide">@include('partials.foto', ['image' => $image, 'eager' => $loop->first])</figure>
+                @empty
+                    <figure class="galeria__slide"><span class="sem-foto">Foto em breve</span></figure>
+                @endforelse
+            </div>
+            @if ($fotos->count() > 1)
+                <button class="galeria__seta galeria__seta--ant" type="button" data-anterior aria-label="Foto anterior">@include('partials.icon', ['name' => 'left'])</button>
+                <button class="galeria__seta galeria__seta--prox" type="button" data-proxima aria-label="Próxima foto">@include('partials.icon', ['name' => 'right'])</button>
+                <p class="galeria__conta num" aria-live="polite"><span data-atual>1</span> / {{ $fotos->count() }}</p>
+            @endif
         </div>
-        @if ($campaign->images->count() > 1)
-            <button class="galeria__seta galeria__seta--ant" type="button" data-anterior aria-label="Foto anterior">@include('partials.icon', ['name' => 'left'])</button>
-            <button class="galeria__seta galeria__seta--prox" type="button" data-proxima aria-label="Próxima foto">@include('partials.icon', ['name' => 'right'])</button>
-            <p class="galeria__conta" aria-live="polite"><span data-atual>1</span> / {{ $campaign->images->count() }}</p>
+        @if ($fotos->count() > 1)
+            <div class="miniaturas" role="group" aria-label="Escolher foto">
+                @foreach ($fotos as $image)
+                    <button type="button" data-ir="{{ $loop->index }}" aria-label="Foto {{ $loop->iteration }}" @if ($loop->first) aria-current="true" @endif>
+                        <img src="{{ $image->url() }}" alt="" width="120" height="80" loading="lazy" decoding="async">
+                    </button>
+                @endforeach
+            </div>
         @endif
     </section>
 
     <section class="compra" aria-labelledby="titulo-campanha">
-        @include('partials.estado', ['state' => $state])
-        <h1 id="titulo-campanha">{{ $campaign->title }}</h1>
-        @if ($campaign->subtitle)<p class="compra__sub">{{ $campaign->subtitle }}</p>@endif
+        <header class="compra__cabeca">
+            @include('partials.estado', ['state' => $state])
+            <h1 id="titulo-campanha">{{ $campaign->title }}</h1>
+            @if ($campaign->subtitle)<p>{{ $campaign->subtitle }}</p>@endif
+        </header>
 
-        @if ($state !== 'em_breve')
-            <div class="progresso">
-                <div class="progresso__texto">
-                    <span><b class="num" data-percentual>{{ number_format($percentual, 2, ',', '.') }}%</b> vendido</span>
-                    @if ($state === 'ativa')
-                        <span data-restantes>{{ termo('restantes', ['n' => number_format($campaign->remaining(), 0, ',', '.')]) }}</span>
+        <div class="compra__cartao">
+            @if ($state !== 'em_breve')
+                <div class="medidor">
+                    <div class="medidor__texto">
+                        <span><b class="num" data-percentual>{{ number_format($percentual, 2, ',', '.') }}%</b> vendido</span>
+                        @if ($state === 'ativa')
+                            <span data-restantes>{{ termo('restantes', ['n' => number_format($campaign->remaining(), 0, ',', '.')]) }}</span>
+                        @endif
+                    </div>
+                    @include('partials.luzes', ['percent' => $percentual])
+                </div>
+            @endif
+
+            @if ($state === 'ativa')
+                <p class="preco"><small>Por apenas</small><strong class="num">{{ brl($campaign->price_cents) }}</strong><small>{{ termo('por_unidade') }}</small></p>
+
+                <form class="pedido" data-pedido novalidate>
+                    <label class="rotulo" for="quantidade">Quantidade</label>
+                    <div class="passo">
+                        <button type="button" data-menos aria-label="Diminuir quantidade">@include('partials.icon', ['name' => 'minus'])</button>
+                        <input class="num" id="quantidade" name="quantidade" type="text" inputmode="numeric" autocomplete="off"
+                            value="{{ $minimo }}" aria-describedby="limites">
+                        <button type="button" data-mais aria-label="Aumentar quantidade">@include('partials.icon', ['name' => 'plus'])</button>
+                    </div>
+                    <div class="atalhos" role="group" aria-label="Somar à quantidade">
+                        @foreach ($campaign->shortcuts() as $atalho)
+                            <button type="button" @class(['atalho', 'atalho--destaque' => $atalho['featured']]) data-soma="{{ $atalho['qty'] }}">
+                                @if ($atalho['featured'])<em>Recomendado</em>@endif
+                                <b class="num">+{{ str_pad((string) $atalho['qty'], 2, '0', STR_PAD_LEFT) }}</b>
+                                <small>Somar</small>
+                            </button>
+                        @endforeach
+                    </div>
+                    <p class="dica" id="limites" data-limites>De {{ $minimo }} a {{ $campaign->maxPurchasable() }} por pedido. Os {{ termo('plural') }} são atribuídos de forma aleatória depois do pagamento.</p>
+
+                    <button class="cta" type="submit" data-cta>
+                        <span class="cta__seta">@include('partials.icon', ['name' => 'arrow', 'size' => 20])</span>
+                        <span class="cta__texto"><b>{{ termo('garantir') }}</b><small>Pagamento por Pix</small></span>
+                        <span class="cta__total"><small data-resumo>{{ $minimo }} × {{ brl($campaign->price_cents) }}</small><b class="num" data-total>{{ brl($minimo * $campaign->price_cents) }}</b></span>
+                    </button>
+                </form>
+            @elseif ($state === 'em_breve')
+                <p class="preco"><small>Por apenas</small><strong class="num">{{ brl($campaign->price_cents) }}</strong><small>{{ termo('por_unidade') }}</small></p>
+                <div class="situacao">
+                    @if ($campaign->starts_at)
+                        <p><strong>As vendas abrem em {{ hora_local($campaign->starts_at, 'd/m/Y \à\s H\hi') }}.</strong></p>
+                        <p>Volte nesse horário para garantir os seus.</p>
+                    @else
+                        <p><strong>A data de abertura das vendas será publicada aqui.</strong></p>
                     @endif
                 </div>
-                <div class="progresso__barra">
-                    <progress max="100" value="{{ $percentual }}" data-barra aria-label="Percentual vendido">{{ $percentual }}%</progress>
+            @elseif ($state === 'esgotada')
+                <div class="situacao">
+                    <p><strong>Todos os {{ termo('plural') }} foram vendidos.</strong></p>
+                    @if ($campaign->draw_at)<p>A apuração está marcada para {{ hora_local($campaign->draw_at, 'd/m/Y \à\s H\hi') }}.</p>@endif
                 </div>
-            </div>
-        @endif
-
-        @if ($state === 'ativa')
-            <p class="preco"><strong class="num">{{ brl($campaign->price_cents) }}</strong> {{ termo('por_unidade') }}</p>
-
-            <form class="pedido" data-pedido novalidate>
-                <label class="rotulo" for="quantidade">Quantidade</label>
-                <div class="passo">
-                    <button type="button" data-menos aria-label="Diminuir quantidade">@include('partials.icon', ['name' => 'minus'])</button>
-                    <input class="num" id="quantidade" name="quantidade" type="text" inputmode="numeric" autocomplete="off"
-                        value="{{ $minimo }}" aria-describedby="limites">
-                    <button type="button" data-mais aria-label="Aumentar quantidade">@include('partials.icon', ['name' => 'plus'])</button>
+            @elseif ($state === 'pausada')
+                <div class="situacao">
+                    <p><strong>As vendas desta campanha estão pausadas.</strong></p>
+                    <p>Quem já comprou continua participando normalmente.</p>
                 </div>
-                <div class="atalhos" role="group" aria-label="Somar à quantidade">
-                    @foreach ($campaign->shortcuts() as $atalho)
-                        <button type="button" class="atalho @if ($atalho['featured']) atalho--destaque @endif" data-soma="{{ $atalho['qty'] }}">
-                            <span class="num">+{{ $atalho['qty'] }}</span>
-                        </button>
-                    @endforeach
+            @elseif ($state === 'aguardando')
+                <div class="situacao">
+                    <p><strong>Vendas encerradas.</strong></p>
+                    @if ($campaign->draw_at)
+                        <p>Apuração em {{ hora_local($campaign->draw_at, 'd/m/Y \à\s H\hi') }}. O resultado é publicado nesta página.</p>
+                    @else
+                        <p>O resultado é publicado nesta página assim que sair a apuração.</p>
+                    @endif
                 </div>
-                <p class="dica" id="limites" data-limites>
-                    De {{ $minimo }} a {{ $campaign->maxPurchasable() }} {{ termo('plural') }} por pedido. Os {{ termo('plural') }} são atribuídos de forma aleatória depois do pagamento.
-                </p>
+            @elseif ($state === 'concluida')
+                <div class="resultado">
+                    <p class="rotulo">@include('partials.icon', ['name' => 'trophy', 'size' => 16]) {{ termo('contemplado') }}</p>
+                    @include('partials.placa', ['numero' => $campaign->winning_number !== null ? $campaign->formatNumber($campaign->winning_number) : '—', 'tipo' => 'ouro grande'])
+                    @if ($campaign->mainWinner)
+                        <p class="resultado__nome">{{ $campaign->mainWinner->display_name }}</p>
+                        <p class="dica">{{ $campaign->mainWinner->prize }} · apurado em {{ hora_local($campaign->drawn_at ?? $campaign->draw_at) }}</p>
+                    @endif
+                    @if ($campaign->official_result)<p class="dica">Resultado oficial: {{ $campaign->official_result }}</p>@endif
+                </div>
+            @endif
 
-                <button class="cta" type="submit" data-cta>
-                    <span class="cta__rotulo">{{ termo('garantir') }}</span>
-                    <span class="cta__total"><small data-resumo>{{ $minimo }} × {{ brl($campaign->price_cents) }}</small><b class="num" data-total>{{ brl($minimo * $campaign->price_cents) }}</b></span>
-                </button>
-                <p class="confianca">@include('partials.icon', ['name' => 'lock', 'size' => 14]) Pagamento por Pix. Sem cadastro com senha.</p>
-            </form>
-        @elseif ($state === 'em_breve')
-            <div class="situacao">
-                <p class="preco"><strong class="num">{{ brl($campaign->price_cents) }}</strong> {{ termo('por_unidade') }}</p>
-                @if ($campaign->starts_at)
-                    <p>As vendas abrem em <strong>{{ hora_local($campaign->starts_at, 'd/m/Y \à\s H\hi') }}</strong>.</p>
-                @else
-                    <p>A data de abertura das vendas será publicada aqui.</p>
-                @endif
-            </div>
-        @elseif ($state === 'esgotada')
-            <div class="situacao">
-                <p><strong>Todos os {{ termo('plural') }} foram vendidos.</strong></p>
-                @if ($campaign->draw_at)<p>A apuração está marcada para {{ hora_local($campaign->draw_at, 'd/m/Y \à\s H\hi') }}.</p>@endif
-            </div>
-        @elseif ($state === 'pausada')
-            <div class="situacao">
-                <p><strong>As vendas desta campanha estão pausadas.</strong></p>
-                <p>Quem já comprou continua participando normalmente.</p>
-            </div>
-        @elseif ($state === 'aguardando')
-            <div class="situacao">
-                <p><strong>Vendas encerradas.</strong></p>
-                @if ($campaign->draw_at)
-                    <p>Apuração em {{ hora_local($campaign->draw_at, 'd/m/Y \à\s H\hi') }}. O resultado é publicado nesta página.</p>
-                @else
-                    <p>O resultado é publicado nesta página assim que sair a apuração.</p>
-                @endif
-            </div>
-        @elseif ($state === 'concluida')
-            <div class="resultado">
-                <p class="rotulo">{{ termo('contemplado') }}</p>
-                <p class="resultado__numero num">{{ $campaign->winning_number !== null ? $campaign->formatNumber($campaign->winning_number) : '—' }}</p>
-                @if ($campaign->mainWinner)
-                    <p class="resultado__nome">{{ $campaign->mainWinner->display_name }}</p>
-                    <p class="dica">{{ $campaign->mainWinner->prize }} · apurado em {{ hora_local($campaign->drawn_at ?? $campaign->draw_at) }}</p>
-                @endif
-                @if ($campaign->official_result)<p class="dica">Resultado oficial: {{ $campaign->official_result }}</p>@endif
-            </div>
-        @endif
+            <a class="compra__consulta" href="{{ route('consulta') }}">@include('partials.icon', ['name' => 'ticket', 'size' => 18]) {{ termo('meus') }} @include('partials.icon', ['name' => 'right', 'size' => 16])</a>
+        </div>
     </section>
 
     <div class="detalhes">
         @if ($promo)
             <section class="promo" aria-labelledby="titulo-promo">
-                <div class="promo__topo">
+                <div class="promo__faixa" aria-hidden="true"></div>
+                <div class="promo__corpo">
                     <p class="rotulo rotulo--alerta">Promoção com prazo</p>
-                    <p class="promo__relogio">@include('partials.icon', ['name' => 'clock', 'size' => 16]) Encerra em
-                        <time class="num" data-contador="{{ $promo->ends_at->toIso8601String() }}">{{ $resto >= 86400 ? intdiv($resto, 86400).'d ' : '' }}{{ gmdate('H:i:s', $resto % 86400) }}</time>
-                    </p>
+                    <h2 id="titulo-promo">{{ $promo->title }}</h2>
+                    <p class="promo__premio">{{ $promo->prize }}</p>
+                    @if ($promo->rules)<p class="promo__regras">{{ $promo->rules }}</p>@endif
+
+                    <div class="contador" data-contador="{{ $promo->ends_at->toIso8601String() }}" role="timer" aria-label="Tempo até o fim da promoção">
+                        <span><b class="num" data-dias>{{ str_pad((string) intdiv($resto, 86400), 2, '0', STR_PAD_LEFT) }}</b><small>dias</small></span>
+                        <span><b class="num" data-horas>{{ gmdate('H', $resto % 86400) }}</b><small>horas</small></span>
+                        <span><b class="num" data-minutos>{{ gmdate('i', $resto) }}</b><small>min</small></span>
+                        <span><b class="num" data-segundos>{{ gmdate('s', $resto) }}</b><small>seg</small></span>
+                    </div>
+
+                    <div class="lider" data-lider @if (! $leader) hidden @endif>
+                        <p class="rotulo">{{ $promo->type === 'maior_numero' ? termo('maior').' até agora' : 'Maior comprador até agora' }}</p>
+                        <span class="placa placa--ouro placa--grande num" data-lider-valor>{{ $leader['value'] ?? '' }}</span>
+                        <p class="lider__quem"><strong data-lider-nome>{{ $leader['name'] ?? '' }}</strong>
+                            <span data-lider-detalhe>{{ collect([$leader['location'] ?? null, isset($leader) ? $leader['at']->diffForHumans() : null])->filter()->implode(' · ') }}</span>
+                        </p>
+                    </div>
+                    <p class="lider-vazio" data-sem-lider @if ($leader) hidden @endif>Ainda não há compra paga neste período.</p>
+                    <p class="dica">Atualiza a cada pagamento confirmado.</p>
                 </div>
-                <h2 id="titulo-promo">{{ $promo->title }} <span>{{ $promo->prize }}</span></h2>
-                @if ($promo->rules)<p class="promo__regras">{{ $promo->rules }}</p>@endif
-                <div class="lider" data-lider @if (! $leader) hidden @endif>
-                    <p class="rotulo">{{ $promo->type === 'maior_numero' ? termo('maior').' até agora' : 'Maior comprador até agora' }}</p>
-                    <p class="lider__valor num" data-lider-valor>{{ $leader['value'] ?? '' }}</p>
-                    <p class="lider__quem"><strong data-lider-nome>{{ $leader['name'] ?? '' }}</strong>
-                        <span data-lider-detalhe>{{ collect([$leader['location'] ?? null, isset($leader) ? $leader['at']->diffForHumans() : null])->filter()->implode(' · ') }}</span>
-                    </p>
-                </div>
-                <p class="lider-vazio" data-sem-lider @if ($leader) hidden @endif>Ainda não há compra paga neste período.</p>
-                <p class="dica">Atualiza a cada pagamento confirmado.</p>
             </section>
         @endif
 
@@ -178,17 +203,6 @@
             </section>
         @endif
 
-        @if ($campaign->draw_criterion || $campaign->draw_at || $campaign->delivery_deadline)
-            <section class="secao" aria-labelledby="titulo-apuracao">
-                <h2 id="titulo-apuracao">Apuração</h2>
-                <dl class="ficha">
-                    @if ($campaign->draw_at)<div><dt>Data</dt><dd>{{ hora_local($campaign->draw_at, 'd/m/Y \à\s H\hi') }}</dd></div>@endif
-                    @if ($campaign->draw_criterion)<div><dt>Critério</dt><dd>{{ $campaign->draw_criterion }}</dd></div>@endif
-                    @if ($campaign->delivery_deadline)<div><dt>Entrega do prêmio</dt><dd>{{ $campaign->delivery_deadline }}</dd></div>@endif
-                </dl>
-            </section>
-        @endif
-
         @if ($instantaneos->isNotEmpty())
             <section class="secao" aria-labelledby="titulo-instantaneos" data-filtro>
                 <div class="secao__topo">
@@ -204,9 +218,12 @@
                     @foreach ($instantaneos->sortByDesc('won_at') as $item)
                         @php $saiu = $item->ticket_id !== null; @endphp
                         <li data-tipo="{{ $saiu ? 'saiu' : 'livre' }}" @class(['saiu' => $saiu])>
-                            <span class="placa num">{{ $saiu || $campaign->instant_revealed_at ? $campaign->formatNumber($item->number) : str_repeat('•', $campaign->digits) }}</span>
-                            <span class="instantaneos__premio">{{ $item->prize }}</span>
-                            <span class="instantaneos__quem">{{ $saiu ? ($item->ticket?->order?->customer?->publicName() ?? 'Contemplado') : 'Disponível' }}</span>
+                            @include('partials.placa', [
+                                'numero' => $saiu || $campaign->instant_revealed_at ? $campaign->formatNumber($item->number) : str_repeat('•', $campaign->digits),
+                                'tipo' => $saiu ? 'ouro' : 'oculta',
+                            ])
+                            <strong>{{ $item->prize }}</strong>
+                            <span>{{ $saiu ? ($item->ticket?->order?->customer?->publicName() ?? 'Contemplado') : 'Disponível' }}</span>
                         </li>
                     @endforeach
                 </ul>
@@ -217,6 +234,17 @@
                         <code>{{ $campaign->instant_hash }}</code>
                     </details>
                 @endif
+            </section>
+        @endif
+
+        @if ($campaign->draw_criterion || $campaign->draw_at || $campaign->delivery_deadline)
+            <section class="secao secao--apuracao" aria-labelledby="titulo-apuracao">
+                <h2 id="titulo-apuracao">Apuração</h2>
+                <dl class="ficha">
+                    @if ($campaign->draw_at)<div><dt>Data</dt><dd>{{ hora_local($campaign->draw_at, 'd/m/Y \à\s H\hi') }}</dd></div>@endif
+                    @if ($campaign->draw_criterion)<div><dt>Critério</dt><dd>{{ $campaign->draw_criterion }}</dd></div>@endif
+                    @if ($campaign->delivery_deadline)<div><dt>Entrega do prêmio</dt><dd>{{ $campaign->delivery_deadline }}</dd></div>@endif
+                </dl>
             </section>
         @endif
 
@@ -255,7 +283,7 @@
             <small data-resumo>{{ $minimo }} × {{ brl($campaign->price_cents) }}</small>
             <b class="num" data-total>{{ brl($minimo * $campaign->price_cents) }}</b>
         </div>
-        <button class="cta cta--curto" type="button" data-cta-fixo>{{ termo('garantir') }} @include('partials.icon', ['name' => 'arrow', 'size' => 18])</button>
+        <button class="cta cta--simples" type="button" data-cta-fixo>{{ termo('garantir') }} @include('partials.icon', ['name' => 'arrow', 'size' => 20])</button>
     </div>
 
     <dialog class="checkout" id="checkout" aria-labelledby="titulo-checkout">
@@ -268,13 +296,15 @@
             <div class="checkout__valor"><p class="rotulo" data-resumo-qtd></p><p class="num" data-total></p></div>
         </div>
         <form class="checkout__passo" data-checkout novalidate>
-            <label for="telefone">Seu telefone com DDD</label>
-            <input id="telefone" name="telefone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(11) 90000-0000" aria-describedby="telefone-ajuda" required>
-            <p class="dica" id="telefone-ajuda" data-telefone-ajuda>Usamos o telefone para localizar seu cadastro e avisar sobre o pedido.</p>
-            <button class="cta cta--curto" type="submit">Continuar @include('partials.icon', ['name' => 'arrow', 'size' => 18])</button>
+            <div class="campo">
+                <label for="telefone">Seu telefone com DDD</label>
+                <input id="telefone" name="telefone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(11) 90000-0000" aria-describedby="telefone-ajuda" required>
+                <p class="dica" id="telefone-ajuda" data-telefone-ajuda>Usamos o telefone para localizar seu cadastro e avisar sobre o pedido.</p>
+            </div>
+            <button class="cta cta--simples" type="submit">Continuar @include('partials.icon', ['name' => 'arrow', 'size' => 20])</button>
             <p class="checkout__aviso" data-checkout-aviso role="status" hidden>O pagamento ainda não está ligado nesta versão de demonstração. Esta etapa entra na próxima entrega.</p>
         </form>
-        <p class="confianca">@include('partials.icon', ['name' => 'lock', 'size' => 14]) Você paga por Pix e recebe os {{ termo('plural') }} na hora da confirmação.</p>
+        <p class="confianca">@include('partials.icon', ['name' => 'lock', 'size' => 14]) Você paga por Pix e recebe os {{ termo('plural') }} na confirmação.</p>
     </dialog>
 @endif
 @endsection

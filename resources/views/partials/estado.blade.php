@@ -9,4 +9,4 @@
         'indisponivel' => 'Indisponível',
     ];
 @endphp
-<span class="estado estado--{{ $state }}">{{ $rotulos[$state] }}</span>
+<span class="estado estado--{{ $state }}"><span>{{ $rotulos[$state] }}</span></span>

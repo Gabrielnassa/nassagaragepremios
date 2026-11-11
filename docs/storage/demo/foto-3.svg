@@ -1,7 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
-<defs><pattern id="h" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)"><rect width="28" height="28" fill="#14161A"/><rect width="1" height="28" fill="#1F232A"/></pattern></defs>
-<rect width="1200" height="800" fill="url(#h)"/>
-<rect x="64" y="64" width="1072" height="672" fill="none" stroke="#2B2F37" stroke-width="2"/>
-<text x="104" y="640" font-family="Arial Narrow, Arial, sans-serif" font-size="150" font-weight="700" fill="#2B2F37">03</text>
-<text x="104" y="692" font-family="Arial, sans-serif" font-size="30" fill="#9299A5">Foto do prêmio: Interior</text>
+<defs>
+<radialGradient id="luz" cx="860" cy="120" r="760" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3A4352"/><stop offset=".55" stop-color="#171B22"/><stop offset="1" stop-color="#08090B"/></radialGradient>
+<linearGradient id="piso" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A1E25"/><stop offset="1" stop-color="#08090B"/></linearGradient>
+<linearGradient id="capa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5C97E8"/><stop offset=".4" stop-color="#2A61AD"/><stop offset="1" stop-color="#132D52"/></linearGradient>
+<radialGradient id="sombra" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".75"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1200" height="800" fill="url(#luz)"/>
+<g transform="translate(-640 -330) scale(1.55)">
+<g stroke="#FFFFFF" stroke-opacity=".035" stroke-width="2"><path d="M-400 120H1600M-400 190H1600M-400 260H1600M-400 330H1600M-400 400H1600M-400 470H1600M-400 540H1600"/></g>
+<rect x="-400" y="610" width="2000" height="400" fill="url(#piso)"/>
+<path d="M-400 610H1600" stroke="#2B303A" stroke-width="2"/>
+<ellipse cx="620" cy="626" rx="560" ry="34" fill="url(#sombra)"/>
+<path d="M150 612C150 560 176 520 232 500C300 478 380 470 440 456C500 402 560 354 660 346C760 340 832 354 890 400C932 430 990 440 1040 462C1076 480 1086 540 1086 612Q1000 624 900 613T700 615T500 612T300 616T150 612Z" fill="url(#capa)"/>
+<g fill="none" stroke="#0C1F3B" stroke-opacity=".5" stroke-width="5" stroke-linecap="round"><path d="M660 350C648 430 640 520 656 610"/><path d="M440 460C428 520 446 570 438 610"/><path d="M890 404C908 480 894 560 912 610"/><path d="M300 484C286 530 300 580 290 612"/><path d="M1000 446C1012 500 998 566 1010 610"/><path d="M560 380C548 450 566 540 552 610"/><path d="M780 348C790 430 772 530 786 612"/></g>
+<path d="M232 500C300 478 380 470 440 456C500 402 560 354 660 346C760 340 832 354 890 400C932 430 990 440 1040 462" fill="none" stroke="#B9D4FA" stroke-opacity=".7" stroke-width="4" stroke-linecap="round"/>
+</g>
+<text x="44" y="70" font-family="Arial Narrow, Arial, sans-serif" font-size="30" font-weight="700" fill="#F1F3F6" fill-opacity=".85" letter-spacing="3">FOTO DE EXEMPLO 03</text>
+<text x="44" y="104" font-family="Arial, sans-serif" font-size="22" fill="#9BA3B0">Interior · a foto real do prêmio entra aqui</text>
 </svg>
